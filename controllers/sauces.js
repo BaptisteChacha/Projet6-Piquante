@@ -71,13 +71,16 @@ exports.like = (req, res, next) => {
         }
       } else if (req.body.like == 0) {
         if (sauce.usersDisliked.includes(req.body.userId)) {
-          sauce.usersDisliked.splice(0, 1)
+          const index = sauce.usersDisliked.indexOf(req.body.userId)
+          sauce.usersDisliked.splice(index, 1)
           sauce.dislikes = sauce.dislikes - 1
+        }
+        if (sauce.usersLiked.includes(req.body.userId)) {
+          const index = sauce.usersLiked.indexOf(req.body.userId)
+          sauce.usersLiked.splice(index, 1)
+          sauce.likes = sauce.likes - 1
+        }
       }
-      else if (sauce.usersLiked.includes(req.body.userId)) {
-        sauce.usersLiked.splice(0, 1)
-        sauce.likes = sauce.likes - 1
-    }}
       //  console.log(sauce)
       sauce.save()
         .then(() => res.status(201).json({ message: 'Avis enregistré !' }))
