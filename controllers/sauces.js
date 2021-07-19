@@ -4,11 +4,7 @@ const fs = require('fs');
 
 exports.createSauce = (req, res, next) => {
 
-  //console.log(JSON.parse(req.body.sauce))
   const sauceObject = JSON.parse(req.body.sauce);
-  //console.log(sauceObject)
-  delete sauceObject._id
-  // console.log(sauceObject)
   const sauce = new Sauce({
     ...sauceObject,
     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
@@ -40,7 +36,6 @@ exports.modifySauce = (req, res, next) => {
   Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
     .then(() => res.status(200).json({ message: 'Sauce modifié !' }))
     .catch(error => res.status(400).json({ error }));
-  // console.log(sauceObject)
 }
 
 exports.deleteSauce = (req, res, next) => {
@@ -81,7 +76,6 @@ exports.like = (req, res, next) => {
           sauce.likes = sauce.likes - 1
         }
       }
-      //  console.log(sauce)
       sauce.save()
         .then(() => res.status(201).json({ message: 'Avis enregistré !' }))
         .catch(error => res.status(400).json({ error }));
