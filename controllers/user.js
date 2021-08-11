@@ -1,12 +1,31 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const app = require('../app');
+var SHA256 = require("crypto-js/sha256");
+require('dotenv').config();
+
+
+const passwordvalidator = require('password-validator');
+var CryptoJS = require('crypto-js');
+
 
 exports.signup = (req, res, next) => {
-    bcrypt.hash(req.body.password, 10)
+    // var emailCrypteSave = CryptoJS.AES.encrypt(JSON.stringify(req.body.email), 'secret key 123').toString();
+    var emailCrypte = CryptoJS.SHA256(JSON.stringify(req.body.email), process.env.ENCRYPT).toString();
+    const passwordValidator = new passwordvalidator();
+    passwordValidator
+        .is().min(8)
+        .is().max(50) 
+        .has().digits(3)
+        .has().not().spaces() 
+        .has().uppercase();  
+    if (passwordValidator.validate(req.body.password)) {
+        console.log('Votre mot de passe est sécurisé')
+        bcrypt.hash(req.body.password, 10)
         .then(hash => {
             const user = new User({
-                email: req.body.email,
+                email: emailCrypte,
                 password: hash
             });
             user.save()
@@ -14,10 +33,16 @@ exports.signup = (req, res, next) => {
                 .catch(error => res.status(400).json({ error }));
         })
         .catch(error => res.status(500).json({ error }));
+    } 
+    else {
+        res.status(400).json({ message: 'Votre mot de passe n\'est pas assez sécurisé'})
+    }
+   
 };
 
 exports.login = (req, res, next) => {
-    User.findOne({ email: req.body.email })
+    var emailCrypte = CryptoJS.SHA256(JSON.stringify(req.body.email), 'secret key 123').toString();
+    User.findOne({ email: emailCrypte })
         .then(user => {
             if (!user) {
                 return res.status(401).json({ error: 'Utilisateur non trouvé !' });
@@ -40,3 +65,4 @@ exports.login = (req, res, next) => {
         })
         .catch(error => res.status(500).json({ error }));
 };
+

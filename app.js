@@ -2,6 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const cookieSession = require('cookie-session');
+
 
 const User = require('./models/User');
 
@@ -27,6 +31,23 @@ app.use((req, res, next) => {
 
 
 app.use(express.json());
+
+app.use(helmet());
+//app.disable('x-powered-by');
+//app.disable('ieNoOpen');
+
+app.use(cookieSession({
+    name: 'session',
+    keys: ['key1', 'key2']
+  }))
+
+const  apiLimiter  =  rateLimit ( {
+    windowMs : 1  *  60  *  1000 ,  // 1 minute
+    max : 100, // maximum de 100 requêtes par minutes
+    message: "Nombre de requête maximum atteinte, veuillez réessayer dans 1 minute"
+  }) ;
+  app.use (apiLimiter) ;
+  
 
 
 app.use('/api/auth', userRoutes);
