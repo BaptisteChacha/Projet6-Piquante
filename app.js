@@ -14,7 +14,7 @@ const userRoutes = require('./routes/user');
 
 const app = express();
 
-mongoose.connect('mongodb+srv://Baptiste:lbt480@cluster0.ich6r.mongodb.net/Project6?retryWrites=true&w=majority',
+mongoose.connect(process.env.BDD,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -33,8 +33,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.use(helmet());
-//app.disable('x-powered-by');
-//app.disable('ieNoOpen');
+
 
 app.use(cookieSession({
     name: 'session',
